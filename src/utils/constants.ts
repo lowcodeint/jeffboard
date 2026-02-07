@@ -1,6 +1,6 @@
 // Constants for agent colors, status colors, and other configuration
 
-import type { StoryStatus, Priority, AgentId } from '../types';
+import type { StoryStatus, Priority } from '../types';
 
 // Column order for the Kanban board
 export const COLUMN_ORDER: StoryStatus[] = [
