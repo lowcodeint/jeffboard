@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+cli/node_modules/
+
+# Build outputs
+dist/
+cli/dist/
+build/
+dist-ssr/
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.*.local
+*.local
+
+# Service account keys (NEVER commit these!)
+*-service-account.json
+service-account*.json
+firebase-adminsdk*.json
+
+# Firebase local emulator data
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Testing
+coverage/
+
+# Production
+*.tsbuildinfo
+
+# OS
+Thumbs.db

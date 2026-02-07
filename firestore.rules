@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: check if the requesting user is in the allowed list
+    function isAllowedUser() {
+      return request.auth != null
+        && request.auth.uid in get(/databases/$(database)/documents/config/allowedUsers).data.uids;
+    }
+
+    // Projects: read-only for authenticated allowed user
+    match /projects/{projectId} {
+      allow read: if isAllowedUser();
+      allow write: if false;  // Only Admin SDK (CLI) can write
+    }
+
+    // Stories: read-only for authenticated allowed user
+    match /stories/{storyId} {
+      allow read: if isAllowedUser();
+      allow write: if false;  // Only Admin SDK (CLI) can write
+
+      // Activity subcollection: same rules
+      match /activity/{activityId} {
+        allow read: if isAllowedUser();
+        allow write: if false;
+      }
+    }
+
+    // Agents: read-only for authenticated allowed user
+    match /agents/{agentId} {
+      allow read: if isAllowedUser();
+      allow write: if false;
+    }
+
+    // Counters: no client access
+    match /counters/{counterId} {
+      allow read, write: if false;
+    }
+
+    // Config: read-only for authenticated allowed user
+    match /config/{configId} {
+      allow read: if isAllowedUser();
+      allow write: if false;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
