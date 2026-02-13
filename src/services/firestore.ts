@@ -13,5 +13,6 @@ export const COLLECTIONS = {
   AGENTS: 'agents',
   COUNTERS: 'counters',
   CONFIG: 'config',
-  ACTIVITY: 'activity' // Subcollection
+  ACTIVITY: 'activity', // Subcollection
+  WEBHOOK_EVENTS: 'webhookEvents'
 } as const;

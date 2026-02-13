@@ -5,6 +5,9 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithRedirect,
+  getRedirectResult,
+  browserLocalPersistence,
+  setPersistence,
   signOut as firebaseSignOut,
   onAuthStateChanged,
   type Auth,
@@ -15,31 +18,40 @@ import { app } from '../lib/firebase';
 // Initialize Firebase Auth
 export const auth: Auth = getAuth(app);
 
+// Set persistence to local (survives browser restarts, works in PWA)
+setPersistence(auth, browserLocalPersistence);
+
 // Google Auth Provider
 const googleProvider = new GoogleAuthProvider();
 
-// Detect if running on iOS (for choosing sign-in method)
-function isIOS(): boolean {
-  return (
-    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-  );
+/**
+ * Handle redirect result on app load (for mobile Safari sign-in flow)
+ * Must be called early in app initialization
+ */
+export async function handleRedirectResult(): Promise<User | null> {
+  try {
+    const result = await getRedirectResult(auth);
+    return result?.user ?? null;
+  } catch (error) {
+    console.error('Redirect result error:', error);
+    return null;
+  }
 }
 
 /**
  * Sign in with Google
- * Uses redirect on iOS (for PWA compatibility), popup on desktop
+ * Uses popup for all environments (works on modern mobile browsers).
+ * Falls back to redirect only if the popup is blocked.
  */
 export async function signInWithGoogle(): Promise<void> {
   try {
-    if (isIOS()) {
-      // Use redirect on iOS for better PWA support
+    await signInWithPopup(auth, googleProvider);
+  } catch (error: any) {
+    // If popup was blocked, fall back to redirect
+    if (error?.code === 'auth/popup-blocked') {
       await signInWithRedirect(auth, googleProvider);
-    } else {
-      // Use popup on desktop for better UX
-      await signInWithPopup(auth, googleProvider);
+      return;
     }
-  } catch (error) {
     console.error('Sign in error:', error);
     throw error;
   }

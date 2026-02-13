@@ -1,6 +1,6 @@
 {
-  "name": "AgentBoard",
-  "short_name": "AgentBoard",
+  "name": "JeffBoard",
+  "short_name": "JeffBoard",
   "description": "Kanban board for AI agent work monitoring",
   "start_url": "/",
   "display": "standalone",

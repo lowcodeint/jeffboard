@@ -3,7 +3,7 @@
 import { Timestamp } from 'firebase/firestore';
 
 // Enums
-export type StoryStatus = 'backlog' | 'in-design' | 'in-progress' | 'in-review' | 'done' | 'blocked';
+export type StoryStatus = 'ideas' | 'backlog' | 'in-design' | 'in-progress' | 'in-review' | 'done' | 'blocked' | 'cancelled';
 export type Priority = 'P0' | 'P1' | 'P2' | 'P3';
 export type Complexity = 'S' | 'M' | 'L' | 'XL';
 export type AgentId =
@@ -11,8 +11,8 @@ export type AgentId =
   | 'solution-architect'
   | 'lead-engineer'
   | 'security-reviewer'
-  | 'ui-consistency-reviewer'
-  | 'mendix-code-explainer';
+  | 'designer'
+  | 'quality-inspector';
 
 // Firestore document interfaces
 export interface Project {
@@ -20,6 +20,8 @@ export interface Project {
   name: string;
   description: string;
   shortCode: string;
+  webhookUrl?: string;
+  burstMode?: boolean;
   isArchived: boolean;
   createdAt: Timestamp;
   updatedAt: Timestamp;
@@ -31,9 +33,25 @@ export interface AcceptanceCriterion {
 }
 
 export interface StoryNote {
+  id?: string;
   text: string;
+  imageUrl?: string;
   author: string;
   createdAt: Timestamp;
+}
+
+export interface NoteReaction {
+  noteId: string;
+  author: string;
+  createdAt: Timestamp;
+}
+
+export interface TokenUsage {
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+  estimatedCostUsd: number;
+  sessions: number;
 }
 
 export interface Story {
@@ -52,6 +70,13 @@ export interface Story {
   complexity: Complexity;
   assignedAgent: string | null;
   notes: StoryNote[];
+  noteReactions: NoteReaction[];
+  tags?: string[];
+  tokenUsage?: TokenUsage | null;
+  lastHeartbeat?: Timestamp | null;
+  heartbeatAgent?: string | null;
+  heartbeatMessage?: string | null;
+  reservedFiles?: string[];
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -80,6 +105,23 @@ export interface AllowedUsersConfig {
   uids: string[];
 }
 
+export interface WebhookEvent {
+  id: string;
+  eventType: 'status-changed';
+  storyId: string;
+  shortId: string;
+  projectId: string;
+  oldStatus: StoryStatus;
+  newStatus: StoryStatus;
+  assignedAgent: string | null;
+  epicName: string | null;
+  status: 'pending' | 'delivered' | 'failed' | 'retrying';
+  error?: string;
+  createdAt: Timestamp;
+  attemptedAt?: Timestamp;
+  attempts: number;
+}
+
 // UI state types
 export interface ToastItem {
   id: string;
@@ -90,12 +132,14 @@ export interface ToastItem {
 
 // Constants
 export const STORY_STATUSES: StoryStatus[] = [
+  'ideas',
   'backlog',
   'in-design',
   'in-progress',
   'in-review',
   'done',
-  'blocked'
+  'blocked',
+  'cancelled'
 ];
 
 export const PRIORITIES: Priority[] = ['P0', 'P1', 'P2', 'P3'];

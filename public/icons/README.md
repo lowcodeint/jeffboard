@@ -14,4 +14,4 @@ You can use tools like:
 
 Or create them manually with a design tool and export at the required sizes.
 
-For now, these are placeholders. Replace with actual AgentBoard logo/icon.
+For now, these are placeholders. Replace with actual JeffBoard logo/icon.

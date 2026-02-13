@@ -5,6 +5,7 @@ cli/node_modules/
 # Build outputs
 dist/
 cli/dist/
+functions/lib/
 build/
 dist-ssr/
 
@@ -59,3 +60,7 @@ coverage/
 
 # OS
 Thumbs.db
+nul
+
+# Accidental artifacts
+*prototype-b64.txt

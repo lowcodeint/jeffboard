@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JB-29: Meetings Collection Schema Design</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #F9FAFB;
+    color: #111827;
+    line-height: 1.6;
+    padding: 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    font-size: 14px;
+    color: #6B7280;
+    margin-bottom: 32px;
+  }
+  h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 32px 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h2 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #2563EB;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin: 16px 0 8px 0;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .card.highlight {
+    border-left: 4px solid #2563EB;
+  }
+  .card.example {
+    border-left: 4px solid #10B981;
+  }
+  .card.index {
+    border-left: 4px solid #F59E0B;
+  }
+  .card.query {
+    border-left: 4px solid #8B5CF6;
+  }
+  pre {
+    background: #1F2937;
+    color: #E5E7EB;
+    border-radius: 6px;
+    padding: 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+  pre .comment { color: #6B7280; }
+  pre .type { color: #93C5FD; }
+  pre .key { color: #A5F3FC; }
+  pre .string { color: #86EFAC; }
+  pre .number { color: #FCD34D; }
+  pre .keyword { color: #C4B5FD; }
+  pre .enum-val { color: #FCA5A5; }
+  code {
+    background: #F3F4F6;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 13px;
+    color: #DC2626;
+  }
+  .tree-diagram {
+    background: #1F2937;
+    color: #E5E7EB;
+    border-radius: 6px;
+    padding: 16px 20px;
+    font-size: 13px;
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+    line-height: 1.7;
+    margin: 8px 0;
+  }
+  .tree-diagram .collection { color: #93C5FD; font-weight: 600; }
+  .tree-diagram .field { color: #A5F3FC; }
+  .tree-diagram .type-hint { color: #6B7280; }
+  .tree-diagram .new-badge {
+    background: #10B981;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-family: system-ui;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 8px 0;
+  }
+  th {
+    text-align: left;
+    padding: 8px 12px;
+    background: #F9FAFB;
+    border-bottom: 2px solid #E5E7EB;
+    font-weight: 600;
+    color: #374151;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #F3F4F6;
+    vertical-align: top;
+  }
+  .badge {
+    display: inline-block;
+    border-radius: 9999px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-blue { background: #DBEAFE; color: #1D4ED8; }
+  .badge-green { background: #D1FAE5; color: #065F46; }
+  .badge-orange { background: #FFEDD5; color: #9A3412; }
+  .badge-purple { background: #EDE9FE; color: #6D28D9; }
+  .badge-red { background: #FEE2E2; color: #991B1B; }
+  .badge-gray { background: #F3F4F6; color: #374151; }
+  .note {
+    background: #FEF9C3;
+    border: 1px solid #FDE68A;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #92400E;
+    margin: 12px 0;
+  }
+  .field-table td:first-child {
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 12px;
+    color: #2563EB;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .field-table td:nth-child(2) {
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 12px;
+    color: #7C3AED;
+    white-space: nowrap;
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid #E5E7EB;
+    margin: 24px 0;
+  }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 768px) {
+    .two-col { grid-template-columns: 1fr; }
+    body { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>JB-29: Meetings Collection Schema</h1>
+<p class="subtitle">Design Proposal &mdash; Retro Tooling Epic &mdash; Single-document pattern, no subcollections</p>
+
+<!-- Section 1: Collection Tree -->
+<h2><span class="num">1</span> Collection Placement</h2>
+<div class="card highlight">
+  <div class="tree-diagram">
+Firestore Root
+&#9474;
+&#9500;&#9472;&#9472; projects/{projectId}
+&#9500;&#9472;&#9472; stories/{storyId}
+&#9500;&#9472;&#9472; agents/{agentId}
+&#9500;&#9472;&#9472; counters/{counterId}
+&#9500;&#9472;&#9472; webhookEvents/{eventId}
+&#9500;&#9472;&#9472; config/allowedUsers
+&#9474;
+&#9492;&#9472;&#9472; <span class="collection">meetings/{meetingId}</span> <span class="new-badge">NEW</span>
+      <span class="field">projectId</span>    <span class="type-hint">// FK to projects collection</span>
+      <span class="field">date</span>         <span class="type-hint">// Timestamp</span>
+      <span class="field">type</span>         <span class="type-hint">// "retro" | "planning" | "ad-hoc"</span>
+      <span class="field">sprintNumber</span> <span class="type-hint">// number | null</span>
+      <span class="field">summary</span>      <span class="type-hint">// string</span>
+      <span class="field">participants</span> <span class="type-hint">// string[]</span>
+      <span class="field">agenda</span>       <span class="type-hint">// AgendaItem[]</span>
+      <span class="field">decisions</span>    <span class="type-hint">// Decision[]</span>
+      <span class="field">actionItems</span>  <span class="type-hint">// ActionItem[]</span>
+      <span class="field">linkedChanges</span><span class="type-hint">// LinkedChange[]</span>
+  </div>
+  <div class="note">
+    <strong>Design decision:</strong> Top-level collection (not a subcollection of projects) for simpler cross-project queries and consistency with the <code>stories</code> pattern. Uses <code>projectId</code> foreign key for filtering.
+  </div>
+</div>
+
+<!-- Section 2: Full TypeScript Schema -->
+<h2><span class="num">2</span> Document Schema</h2>
+<div class="card highlight">
+<pre><span class="comment">// meetings/{meetingId}</span>
+<span class="keyword">interface</span> <span class="type">Meeting</span> {
+  <span class="key">id</span>: <span class="type">string</span>;                  <span class="comment">// Firestore document ID (auto-generated)</span>
+  <span class="key">projectId</span>: <span class="type">string</span>;           <span class="comment">// FK to projects collection</span>
+  <span class="key">type</span>: <span class="type">MeetingType</span>;            <span class="comment">// "retro" | "planning" | "ad-hoc"</span>
+  <span class="key">date</span>: <span class="type">Timestamp</span>;              <span class="comment">// When the meeting occurred/is scheduled</span>
+  <span class="key">sprintNumber</span>: <span class="type">number</span> | <span class="type">null</span>; <span class="comment">// Sprint this meeting relates to (null for ad-hoc)</span>
+  <span class="key">summary</span>: <span class="type">string</span>;              <span class="comment">// Brief meeting summary/notes</span>
+  <span class="key">participants</span>: <span class="type">string</span>[];       <span class="comment">// Agent names and/or user IDs</span>
+
+  <span class="comment">// Structured arrays (embedded, not subcollections)</span>
+  <span class="key">agenda</span>: <span class="type">AgendaItem</span>[];          <span class="comment">// Discussion topics</span>
+  <span class="key">decisions</span>: <span class="type">Decision</span>[];         <span class="comment">// Decisions made during meeting</span>
+  <span class="key">actionItems</span>: <span class="type">ActionItem</span>[];     <span class="comment">// Tasks/follow-ups assigned</span>
+  <span class="key">linkedChanges</span>: <span class="type">LinkedChange</span>[]; <span class="comment">// Artifacts produced</span>
+
+  <span class="key">createdAt</span>: <span class="type">Timestamp</span>;         <span class="comment">// Firestore server timestamp</span>
+  <span class="key">updatedAt</span>: <span class="type">Timestamp</span>;         <span class="comment">// Updated on any edit</span>
+}
+
+<span class="keyword">type</span> <span class="type">MeetingType</span> = <span class="string">"retro"</span> | <span class="string">"planning"</span> | <span class="string">"ad-hoc"</span>;
+</pre>
+</div>
+
+<!-- Sub-types -->
+<h3>Embedded Array Types</h3>
+<div class="two-col">
+  <div class="card">
+    <h3>AgendaItem</h3>
+<pre><span class="keyword">interface</span> <span class="type">AgendaItem</span> {
+  <span class="key">topic</span>: <span class="type">string</span>;         <span class="comment">// Discussion topic</span>
+  <span class="key">presenter</span>: <span class="type">string</span> | <span class="type">null</span>; <span class="comment">// Who raised it</span>
+  <span class="key">notes</span>: <span class="type">string</span>;         <span class="comment">// Discussion notes</span>
+  <span class="key">resolved</span>: <span class="type">boolean</span>;     <span class="comment">// Was it resolved?</span>
+}</pre>
+  </div>
+  <div class="card">
+    <h3>Decision</h3>
+<pre><span class="keyword">interface</span> <span class="type">Decision</span> {
+  <span class="key">text</span>: <span class="type">string</span>;          <span class="comment">// What was decided</span>
+  <span class="key">rationale</span>: <span class="type">string</span>;     <span class="comment">// Why this decision</span>
+  <span class="key">category</span>: <span class="type">DecisionCategory</span>;
+}
+
+<span class="keyword">type</span> <span class="type">DecisionCategory</span> =
+  <span class="string">"process"</span> | <span class="string">"technical"</span> | <span class="string">"product"</span>;
+</pre>
+  </div>
+  <div class="card">
+    <h3>ActionItem</h3>
+<pre><span class="keyword">interface</span> <span class="type">ActionItem</span> {
+  <span class="key">id</span>: <span class="type">string</span>;            <span class="comment">// Unique within doc (UUID)</span>
+  <span class="key">text</span>: <span class="type">string</span>;          <span class="comment">// Task description</span>
+  <span class="key">owner</span>: <span class="type">string</span>;         <span class="comment">// Agent name or user</span>
+  <span class="key">status</span>: <span class="type">ActionStatus</span>;  <span class="comment">// "open" | "done"</span>
+  <span class="key">dueBy</span>: <span class="type">Timestamp</span> | <span class="type">null</span>; <span class="comment">// Optional deadline</span>
+  <span class="key">linkedStoryId</span>: <span class="type">string</span> | <span class="type">null</span>; <span class="comment">// FK to stories</span>
+}
+
+<span class="keyword">type</span> <span class="type">ActionStatus</span> = <span class="string">"open"</span> | <span class="string">"done"</span>;
+</pre>
+  </div>
+  <div class="card">
+    <h3>LinkedChange</h3>
+<pre><span class="keyword">interface</span> <span class="type">LinkedChange</span> {
+  <span class="key">type</span>: <span class="type">ChangeType</span>;      <span class="comment">// What kind of artifact</span>
+  <span class="key">refId</span>: <span class="type">string</span>;         <span class="comment">// Story shortId, commit, etc.</span>
+  <span class="key">description</span>: <span class="type">string</span>;   <span class="comment">// Brief description</span>
+}
+
+<span class="keyword">type</span> <span class="type">ChangeType</span> =
+  <span class="string">"story"</span> | <span class="string">"commit"</span> | <span class="string">"deploy"</span>
+  | <span class="string">"config-change"</span>;
+</pre>
+  </div>
+</div>
+
+<!-- Section 3: Example Document -->
+<h2><span class="num">3</span> Example Document</h2>
+<div class="card example">
+<pre>{
+  <span class="key">"id"</span>: <span class="string">"abc123def456"</span>,
+  <span class="key">"projectId"</span>: <span class="string">"proj_jeffboard_01"</span>,
+  <span class="key">"type"</span>: <span class="string">"retro"</span>,
+  <span class="key">"date"</span>: <span class="string">"2026-02-10T18:00:00Z"</span>,  <span class="comment">// Firestore Timestamp</span>
+  <span class="key">"sprintNumber"</span>: <span class="number">5</span>,
+  <span class="key">"summary"</span>: <span class="string">"Sprint 5 retrospective. Discussed burst mode improvements and CLI reliability."</span>,
+  <span class="key">"participants"</span>: [<span class="string">"product-manager"</span>, <span class="string">"lead-engineer"</span>, <span class="string">"solution-architect"</span>],
+
+  <span class="key">"agenda"</span>: [
+    {
+      <span class="key">"topic"</span>: <span class="string">"Burst mode stability"</span>,
+      <span class="key">"presenter"</span>: <span class="string">"lead-engineer"</span>,
+      <span class="key">"notes"</span>: <span class="string">"File reservation conflicts reduced by 90% after JB-18"</span>,
+      <span class="key">"resolved"</span>: <span class="number">true</span>
+    },
+    {
+      <span class="key">"topic"</span>: <span class="string">"Retro tooling epic planning"</span>,
+      <span class="key">"presenter"</span>: <span class="string">"product-manager"</span>,
+      <span class="key">"notes"</span>: <span class="string">"Agreed on meetings collection as foundational schema"</span>,
+      <span class="key">"resolved"</span>: <span class="number">true</span>
+    }
+  ],
+
+  <span class="key">"decisions"</span>: [
+    {
+      <span class="key">"text"</span>: <span class="string">"Use single-document pattern for meetings, no subcollections"</span>,
+      <span class="key">"rationale"</span>: <span class="string">"Keeps reads atomic and consistent with stories pattern"</span>,
+      <span class="key">"category"</span>: <span class="string">"technical"</span>
+    },
+    {
+      <span class="key">"text"</span>: <span class="string">"Prioritize retro tooling epic for next sprint"</span>,
+      <span class="key">"rationale"</span>: <span class="string">"Team needs structured meeting history for better process"</span>,
+      <span class="key">"category"</span>: <span class="string">"product"</span>
+    }
+  ],
+
+  <span class="key">"actionItems"</span>: [
+    {
+      <span class="key">"id"</span>: <span class="string">"ai-001"</span>,
+      <span class="key">"text"</span>: <span class="string">"Implement meetings CRUD CLI commands"</span>,
+      <span class="key">"owner"</span>: <span class="string">"lead-engineer"</span>,
+      <span class="key">"status"</span>: <span class="string">"open"</span>,
+      <span class="key">"dueBy"</span>: <span class="string">"2026-02-14T00:00:00Z"</span>,
+      <span class="key">"linkedStoryId"</span>: <span class="string">"JB-30"</span>
+    },
+    {
+      <span class="key">"id"</span>: <span class="string">"ai-002"</span>,
+      <span class="key">"text"</span>: <span class="string">"Add meeting list/detail views to web UI"</span>,
+      <span class="key">"owner"</span>: <span class="string">"lead-engineer"</span>,
+      <span class="key">"status"</span>: <span class="string">"open"</span>,
+      <span class="key">"dueBy"</span>: <span class="type">null</span>,
+      <span class="key">"linkedStoryId"</span>: <span class="string">"JB-31"</span>
+    }
+  ],
+
+  <span class="key">"linkedChanges"</span>: [
+    {
+      <span class="key">"type"</span>: <span class="string">"story"</span>,
+      <span class="key">"refId"</span>: <span class="string">"JB-18"</span>,
+      <span class="key">"description"</span>: <span class="string">"File reservation feature completed"</span>
+    },
+    {
+      <span class="key">"type"</span>: <span class="string">"deploy"</span>,
+      <span class="key">"refId"</span>: <span class="string">"v2.3.0"</span>,
+      <span class="key">"description"</span>: <span class="string">"Burst mode v2 deployed to production"</span>
+    }
+  ],
+
+  <span class="key">"createdAt"</span>: <span class="string">"2026-02-10T18:00:00Z"</span>,
+  <span class="key">"updatedAt"</span>: <span class="string">"2026-02-10T19:30:00Z"</span>
+}</pre>
+</div>
+
+<!-- Section 4: Query Patterns -->
+<h2><span class="num">4</span> Query Patterns</h2>
+<div class="card query">
+<table>
+  <thead>
+    <tr>
+      <th>Query</th>
+      <th>Used By</th>
+      <th>Firestore Call</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>List meetings for project</strong></td>
+      <td>Meeting list page, CLI <code>meeting list</code></td>
+      <td><code>meetings.where("projectId","==",id).orderBy("date","desc")</code></td>
+    </tr>
+    <tr>
+      <td><strong>Get single meeting</strong></td>
+      <td>Meeting detail view, CLI <code>meeting get</code></td>
+      <td><code>meetings.doc(meetingId).get()</code></td>
+    </tr>
+    <tr>
+      <td><strong>Meetings by type</strong></td>
+      <td>Retro history filter</td>
+      <td><code>meetings.where("projectId","==",id).where("type","==","retro").orderBy("date","desc")</code></td>
+    </tr>
+    <tr>
+      <td><strong>Meetings for sprint</strong></td>
+      <td>Sprint summary view</td>
+      <td><code>meetings.where("projectId","==",id).where("sprintNumber","==",n)</code></td>
+    </tr>
+    <tr>
+      <td><strong>Open action items</strong><br><span class="badge badge-red">Critical for JB-32</span></td>
+      <td>Pre-meeting data pull</td>
+      <td><code>meetings.where("projectId","==",id).where("actionItems","array-contains",{status:"open"})</code><br><br>
+      <em>See note below on alternative approach</em></td>
+    </tr>
+  </tbody>
+</table>
+<div class="note">
+  <strong>Open action items query:</strong> Firestore's <code>array-contains</code> cannot query on partial object matches inside arrays. Two alternatives:<br><br>
+  <strong>Option A (Recommended):</strong> Client-side filter. Fetch recent meetings (last N or date range) and filter <code>actionItems</code> where <code>status === "open"</code> in application code. Simple, no extra writes, works well for small-to-medium meeting counts.<br><br>
+  <strong>Option B:</strong> Add a top-level <code>hasOpenActions: boolean</code> field, maintained on each update. Query <code>where("hasOpenActions","==",true)</code> to narrow results, then client-side filter. Adds write complexity but reduces reads for large datasets.<br><br>
+  <strong>Recommendation:</strong> Start with Option A. JB-32's pre-meeting prep can fetch the last 10-20 meetings by date and scan action items client-side. Migrate to Option B only if performance becomes an issue.
+</div>
+</div>
+
+<!-- Section 5: Index Requirements -->
+<h2><span class="num">5</span> Index Requirements</h2>
+<div class="card index">
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Collection</th>
+      <th>Fields</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-orange">1</span></td>
+      <td><code>meetings</code></td>
+      <td><code>projectId</code> ASC, <code>date</code> DESC</td>
+      <td>Primary list query &mdash; all meetings for a project sorted by date</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-orange">2</span></td>
+      <td><code>meetings</code></td>
+      <td><code>projectId</code> ASC, <code>type</code> ASC, <code>date</code> DESC</td>
+      <td>Filter by meeting type (retro/planning/ad-hoc) within a project</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-orange">3</span></td>
+      <td><code>meetings</code></td>
+      <td><code>projectId</code> ASC, <code>sprintNumber</code> ASC</td>
+      <td>Find meetings for a specific sprint</td>
+    </tr>
+  </tbody>
+</table>
+<div class="note">
+  <strong>Index deployment:</strong> These should be added to <code>firestore.indexes.json</code> during JB-30 implementation. No deployment needed for this design story.
+</div>
+</div>
+
+<!-- Section 6: Security Rules -->
+<h2><span class="num">6</span> Security Rules (Draft)</h2>
+<div class="card">
+<pre><span class="comment">// To be added to firestore.rules during JB-30 implementation</span>
+<span class="keyword">match</span> /meetings/{meetingId} {
+  <span class="comment">// Read: same as other collections (allowed users only)</span>
+  <span class="keyword">allow</span> read: <span class="keyword">if</span> isAllowedUser();
+
+  <span class="comment">// Write: CLI/Admin SDK only (no client writes for V1)</span>
+  <span class="comment">// Meetings are created/updated via CLI commands, not the PWA</span>
+  <span class="keyword">allow</span> write: <span class="keyword">if</span> <span class="enum-val">false</span>;
+}</pre>
+<div class="note">
+  <strong>V1 approach:</strong> Meetings are CLI-only write (via Admin SDK, which bypasses rules). The web UI reads meetings for display only. This matches the pattern used for story creation. If web-based meeting editing is needed later, add granular <code>create</code>/<code>update</code> rules.
+</div>
+</div>
+
+<!-- Section 7: Document Size Estimate -->
+<h2><span class="num">7</span> Document Size &amp; Limits</h2>
+<div class="card">
+<table>
+  <thead>
+    <tr>
+      <th>Component</th>
+      <th>Typical Count</th>
+      <th>Est. Size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Base fields (date, type, summary, etc.)</td>
+      <td>1</td>
+      <td>~500 bytes</td>
+    </tr>
+    <tr>
+      <td>Agenda items</td>
+      <td>3-8</td>
+      <td>~1-2 KB</td>
+    </tr>
+    <tr>
+      <td>Decisions</td>
+      <td>2-5</td>
+      <td>~0.5-1 KB</td>
+    </tr>
+    <tr>
+      <td>Action items</td>
+      <td>3-10</td>
+      <td>~1-2 KB</td>
+    </tr>
+    <tr>
+      <td>Linked changes</td>
+      <td>2-6</td>
+      <td>~0.5-1 KB</td>
+    </tr>
+    <tr>
+      <td colspan="2"><strong>Typical total per document</strong></td>
+      <td><strong>~3-7 KB</strong></td>
+    </tr>
+  </tbody>
+</table>
+<div class="note">
+    Well within Firestore's 1 MB document limit. Even with verbose summaries, a meeting doc should stay under 20 KB. The single-document pattern is safe here.
+</div>
+</div>
+
+<!-- Section 8: Key Design Decisions Summary -->
+<h2><span class="num">8</span> Design Decisions Summary</h2>
+<div class="card">
+<table>
+  <thead>
+    <tr>
+      <th>Decision</th>
+      <th>Choice</th>
+      <th>Rationale</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Collection placement</td>
+      <td><span class="badge badge-blue">Top-level</span></td>
+      <td>Consistent with <code>stories</code>. Simpler cross-project queries.</td>
+    </tr>
+    <tr>
+      <td>Document structure</td>
+      <td><span class="badge badge-blue">Single doc, no subcollections</span></td>
+      <td>Per story requirements. Atomic reads. Arrays for embedded data.</td>
+    </tr>
+    <tr>
+      <td>Action item IDs</td>
+      <td><span class="badge badge-green">UUID in <code>id</code> field</span></td>
+      <td>Enables targeted updates to specific action items within the array.</td>
+    </tr>
+    <tr>
+      <td>Open actions query</td>
+      <td><span class="badge badge-purple">Client-side filter (Option A)</span></td>
+      <td>Simplest approach. Migrate to indexed field if needed.</td>
+    </tr>
+    <tr>
+      <td>Write access</td>
+      <td><span class="badge badge-gray">CLI/Admin SDK only (V1)</span></td>
+      <td>Meetings created by agents via CLI. Web UI is read-only.</td>
+    </tr>
+    <tr>
+      <td><code>linkedStoryId</code> on actions</td>
+      <td><span class="badge badge-green">Optional string</span></td>
+      <td>Links to story shortId (e.g. "JB-30"). Not a hard FK &mdash; stories may not exist yet.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+</body>
+</html>

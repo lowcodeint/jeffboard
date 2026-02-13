@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Inline Assignment Dropdown Mockup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a2e; color: #e0e0e0; padding: 24px; }
+
+  .sheet {
+    background: #111827;
+    border-radius: 16px;
+    max-width: 480px;
+    margin: 0 auto;
+    overflow: visible;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+  }
+
+  .header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #374151;
+  }
+  .header .shortId { font-size: 13px; color: #9CA3AF; font-weight: 500; }
+  .header .priority { display: inline-block; background: #EAB308; color: white; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; margin-left: 8px; }
+  .header h2 { font-size: 20px; font-weight: 700; color: #F3F4F6; margin-top: 8px; }
+
+  .metadata {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 20px 24px;
+  }
+
+  .field-label { font-size: 11px; font-weight: 500; color: #9CA3AF; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .status-btn, .assignment-btn {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 14px; font-weight: 500; color: #F3F4F6;
+    cursor: pointer; background: none; border: none;
+    transition: color 0.15s;
+  }
+  .status-btn:hover, .assignment-btn:hover { color: #60A5FA; }
+
+  .chevron { width: 14px; height: 14px; color: #9CA3AF; transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+
+  .avatar {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600; color: white; flex-shrink: 0;
+  }
+  .avatar.unassigned { background: #6B7280; }
+  .avatar.pm { background: #FACC15; }
+  .avatar.sa { background: #FB923C; }
+  .avatar.le { background: #22D3EE; }
+  .avatar.sr { background: #F87171; }
+  .avatar.de { background: #60A5FA; }
+  .avatar.qi { background: #C084FC; }
+
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    width: 224px;
+    background: #1F2937;
+    border: 1px solid #374151;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    overflow: hidden;
+    z-index: 50;
+  }
+
+  .dropdown-list { padding: 4px 0; max-height: 256px; overflow-y: auto; }
+
+  .dropdown-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 16px;
+    font-size: 14px; color: #F3F4F6;
+    cursor: pointer; border: none; background: none; width: 100%; text-align: left;
+    transition: background 0.15s;
+  }
+  .dropdown-item:hover { background: #374151; }
+  .dropdown-item.selected { background: rgba(37, 99, 235, 0.15); color: #93C5FD; }
+
+  .dropdown-item .name { flex: 1; }
+
+  .checkmark { width: 16px; height: 16px; color: #60A5FA; }
+
+  .separator { border-top: 1px solid #374151; margin: 4px 0; }
+
+  .field-value { font-size: 14px; font-weight: 500; color: #F3F4F6; }
+
+  .relative { position: relative; }
+
+  .demo-container {
+    display: flex; gap: 32px; align-items: flex-start; justify-content: center;
+    flex-wrap: wrap;
+  }
+  .demo-label {
+    text-align: center; font-size: 12px; color: #6B7280; margin-top: 12px;
+    font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em;
+  }
+</style>
+</head>
+<body>
+  <div class="demo-container">
+    <!-- Closed state -->
+    <div>
+      <div class="sheet">
+        <div class="header">
+          <span class="shortId">JB-42</span>
+          <span class="priority">P2</span>
+          <h2>Change Assignment on User Story</h2>
+        </div>
+        <div class="metadata">
+          <div class="relative">
+            <div class="field-label">Status</div>
+            <button class="status-btn">
+              In Progress
+              <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+          </div>
+          <div>
+            <div class="field-label">Priority</div>
+            <div class="field-value">Medium</div>
+          </div>
+          <div>
+            <div class="field-label">Complexity</div>
+            <div class="field-value">S</div>
+          </div>
+          <div class="relative">
+            <div class="field-label">Assigned Agent</div>
+            <button class="assignment-btn">
+              <div class="avatar le">LE</div>
+              Lead Engineer
+              <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="demo-label">Closed state</div>
+    </div>
+
+    <!-- Open state with dropdown -->
+    <div>
+      <div class="sheet" style="overflow: visible;">
+        <div class="header">
+          <span class="shortId">JB-42</span>
+          <span class="priority">P2</span>
+          <h2>Change Assignment on User Story</h2>
+        </div>
+        <div class="metadata" style="padding-bottom: 280px;">
+          <div class="relative">
+            <div class="field-label">Status</div>
+            <button class="status-btn">
+              In Progress
+              <svg class="chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+          </div>
+          <div>
+            <div class="field-label">Priority</div>
+            <div class="field-value">Medium</div>
+          </div>
+          <div>
+            <div class="field-label">Complexity</div>
+            <div class="field-value">S</div>
+          </div>
+          <div class="relative">
+            <div class="field-label">Assigned Agent</div>
+            <button class="assignment-btn" style="color: #60A5FA;">
+              <div class="avatar le">LE</div>
+              Lead Engineer
+              <svg class="chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div class="dropdown">
+              <div class="dropdown-list">
+                <button class="dropdown-item">
+                  <div class="avatar unassigned">?</div>
+                  <span class="name">Unassigned</span>
+                </button>
+                <div class="separator"></div>
+                <button class="dropdown-item">
+                  <div class="avatar pm">PM</div>
+                  <span class="name">Product Manager</span>
+                </button>
+                <button class="dropdown-item">
+                  <div class="avatar sa">SA</div>
+                  <span class="name">Solution Architect</span>
+                </button>
+                <button class="dropdown-item selected">
+                  <div class="avatar le">LE</div>
+                  <span class="name">Lead Engineer</span>
+                  <svg class="checkmark" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </button>
+                <button class="dropdown-item">
+                  <div class="avatar sr">SR</div>
+                  <span class="name">Security Reviewer</span>
+                </button>
+                <button class="dropdown-item">
+                  <div class="avatar de">DE</div>
+                  <span class="name">Designer</span>
+                </button>
+                <button class="dropdown-item">
+                  <div class="avatar qi">QI</div>
+                  <span class="name">Quality Inspector</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-label">Dropdown open</div>
+    </div>
+  </div>
+</body>
+</html>

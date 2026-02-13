@@ -9,21 +9,47 @@ service cloud.firestore {
         && request.auth.uid in get(/databases/$(database)/documents/config/allowedUsers).data.uids;
     }
 
-    // Projects: read-only for authenticated allowed user
+    // Projects: read for allowed users; scoped update for burstMode toggle
     match /projects/{projectId} {
       allow read: if isAllowedUser();
-      allow write: if false;  // Only Admin SDK (CLI) can write
-    }
+      allow update: if isAllowedUser()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['burstMode', 'updatedAt']);
+      allow create, delete: if false;  // Only Admin SDK (CLI) can create/delete
 
-    // Stories: read-only for authenticated allowed user
-    match /stories/{storyId} {
-      allow read: if isAllowedUser();
-      allow write: if false;  // Only Admin SDK (CLI) can write
-
-      // Activity subcollection: same rules
-      match /activity/{activityId} {
+      // Context subcollection: read for allowed users, write via Admin SDK only
+      match /context/{sectionName} {
         allow read: if isAllowedUser();
         allow write: if false;
+      }
+    }
+
+    // Stories: read for allowed users; scoped update for notes only
+    match /stories/{storyId} {
+      allow read: if isAllowedUser();
+      allow update: if isAllowedUser()
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['notes', 'noteReactions', 'updatedAt', 'status', 'previousStatus', 'blockedReason',
+                        'title', 'description', 'userStory', 'epicName', 'priority', 'complexity', 'assignedAgent', 'tags', 'tokenUsage', 'reservedFiles']);
+      allow create: if isAllowedUser()
+        && request.resource.data.keys().hasAll([
+             'id', 'shortId', 'projectId', 'title', 'description', 'userStory',
+             'epicName', 'acceptanceCriteria', 'status', 'previousStatus',
+             'blockedReason', 'priority', 'complexity', 'assignedAgent',
+             'notes', 'noteReactions', 'createdAt', 'updatedAt'
+           ])
+        && request.resource.data.status in ['backlog', 'ideas']
+        && request.resource.data.previousStatus == null
+        && request.resource.data.title is string && request.resource.data.title.size() > 0
+        && request.resource.data.projectId is string && request.resource.data.projectId.size() > 0
+        && request.resource.data.priority in ['P0', 'P1', 'P2', 'P3']
+        && request.resource.data.complexity in ['S', 'M', 'L', 'XL'];
+      allow delete: if false;  // Only Admin SDK (CLI) can delete
+
+      // Activity subcollection: read + create for allowed users
+      match /activity/{activityId} {
+        allow read: if isAllowedUser();
+        allow create: if isAllowedUser();
       }
     }
 
@@ -33,15 +59,31 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Counters: no client access
+    // Counters: allowed users can read/write (needed for atomic shortId generation)
     match /counters/{counterId} {
-      allow read, write: if false;
+      allow read, write: if isAllowedUser();
     }
 
-    // Config: read-only for authenticated allowed user
+    // Config: read for allowed users; scheduler doc is editable for maxConcurrentSessions
     match /config/{configId} {
       allow read: if isAllowedUser();
-      allow write: if false;
+      allow update: if isAllowedUser()
+        && configId == 'scheduler'
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['maxConcurrentSessions']);
+      allow create, delete: if false;
+    }
+
+    // Meetings: read for allowed users; write via CLI/Admin SDK only
+    match /meetings/{meetingId} {
+      allow read: if isAllowedUser();
+      allow write: if false;  // Only Admin SDK (CLI) can create/update
+    }
+
+    // Webhook events: read-only for authenticated allowed user
+    match /webhookEvents/{eventId} {
+      allow read: if isAllowedUser();
+      allow write: if false;  // Only Admin SDK (Cloud Functions) can write
     }
 
     // Default deny

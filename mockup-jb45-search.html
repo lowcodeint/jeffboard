@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JB-45 Search Design Mockup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    @keyframes fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fade-in 0.3s ease-out; }
+  </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col">
+
+  <!-- ========== HEADER ========== -->
+  <header class="bg-white border-b-2 border-gray-200 shadow-sm">
+    <div class="px-4 py-3 flex items-center justify-between gap-3">
+      <h1 class="text-xl font-bold text-gray-900 flex-shrink-0">JeffBoard</h1>
+      <div class="flex-1 flex justify-center items-center gap-2">
+        <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">
+          Struxure
+          <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <nav class="hidden sm:flex items-center bg-gray-100 rounded-lg p-0.5">
+          <button class="px-3 py-1.5 text-xs font-medium rounded-md text-white bg-blue-600 shadow-sm">Board</button>
+          <button class="px-3 py-1.5 text-xs font-medium rounded-md text-gray-500 hover:text-gray-700">Tokens</button>
+          <button class="px-3 py-1.5 text-xs font-medium rounded-md text-gray-500 hover:text-gray-700">Activity</button>
+        </nav>
+        <button class="p-1.5 text-gray-600 hover:text-gray-900 transition-colors" aria-label="Create story">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        </button>
+        <div class="hidden sm:flex w-7 h-7 rounded-full bg-gray-300 items-center justify-center">
+          <span class="text-xs font-medium text-gray-700">J</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========== AGENT SUMMARY BAR ========== -->
+  <div class="bg-white border-b border-gray-200 px-4 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
+    <button class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-yellow-300 bg-yellow-50 text-yellow-700 whitespace-nowrap">
+      <span class="w-5 h-5 rounded-full bg-yellow-400 inline-flex items-center justify-center text-[10px] text-white font-bold">PM</span>
+      product-manager <span class="text-yellow-500 font-semibold">3</span>
+    </button>
+    <button class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-cyan-300 bg-cyan-50 text-cyan-700 whitespace-nowrap">
+      <span class="w-5 h-5 rounded-full bg-cyan-400 inline-flex items-center justify-center text-[10px] text-white font-bold">LE</span>
+      lead-engineer <span class="text-cyan-500 font-semibold">5</span>
+    </button>
+    <button class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-blue-300 bg-blue-50 text-blue-700 whitespace-nowrap">
+      <span class="w-5 h-5 rounded-full bg-blue-400 inline-flex items-center justify-center text-[10px] text-white font-bold">DE</span>
+      designer <span class="text-blue-500 font-semibold">2</span>
+    </button>
+    <button class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-purple-300 bg-purple-50 text-purple-700 whitespace-nowrap">
+      <span class="w-5 h-5 rounded-full bg-purple-400 inline-flex items-center justify-center text-[10px] text-white font-bold">QI</span>
+      quality-inspector <span class="text-purple-500 font-semibold">1</span>
+    </button>
+  </div>
+
+  <!-- ========== FILTER BAR WITH SEARCH (DESIGN PROPOSAL) ========== -->
+  <div class="bg-white border-b border-gray-200">
+    <!-- Filter header row - now includes search input -->
+    <div class="flex items-center justify-between px-4 py-2 border-b border-gray-100">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Filters</span>
+      </div>
+
+      <!-- SEARCH INPUT - NEW: Positioned in the filter header, right-aligned -->
+      <div class="flex items-center gap-2">
+        <div class="relative">
+          <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input
+            type="text"
+            placeholder="Search stories..."
+            value="auth"
+            class="w-56 pl-8 pr-8 py-1.5 text-sm rounded-lg border border-gray-300 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all"
+          />
+          <!-- Clear button (visible when there's text) -->
+          <button class="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <!-- Match count badge -->
+        <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-semibold text-blue-700 bg-blue-100 rounded-full">
+          3 matches
+        </span>
+      </div>
+    </div>
+
+    <!-- Agent filter section -->
+    <div>
+      <div class="px-4 py-1 bg-gray-50">
+        <span class="text-xs font-medium text-gray-500">Agents</span>
+      </div>
+      <div class="px-4 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
+        <button class="px-3 py-1 rounded-full text-xs font-medium border border-gray-300 text-gray-600 whitespace-nowrap hover:bg-gray-50">product-manager</button>
+        <button class="px-3 py-1 rounded-full text-xs font-medium border border-gray-300 text-gray-600 whitespace-nowrap hover:bg-gray-50">lead-engineer</button>
+        <button class="px-3 py-1 rounded-full text-xs font-medium border border-gray-300 text-gray-600 whitespace-nowrap hover:bg-gray-50">designer</button>
+        <button class="px-3 py-1 rounded-full text-xs font-medium border border-gray-300 text-gray-600 whitespace-nowrap hover:bg-gray-50">quality-inspector</button>
+      </div>
+    </div>
+
+    <!-- Priority filter section -->
+    <div>
+      <div class="px-4 py-1 bg-gray-50">
+        <span class="text-xs font-medium text-gray-500">Priority</span>
+      </div>
+      <div class="px-4 py-2 flex gap-2 overflow-x-auto scrollbar-hide">
+        <button class="px-3 py-1 rounded-full text-xs font-medium border border-red-300 text-red-600 whitespace-nowrap">P0 <span class="text-red-400">2</span></button>
+        <button class="px-3 py-1 rounded-full text-xs font-medium border border-orange-300 text-orange-600 whitespace-nowrap">P1 <span class="text-orange-400">4</span></button>
+        <button class="px-3 py-1 rounded-full text-xs font-medium border border-yellow-300 text-yellow-600 whitespace-nowrap">P2 <span class="text-yellow-400">6</span></button>
+        <button class="px-3 py-1 rounded-full text-xs font-medium border border-gray-300 text-gray-600 whitespace-nowrap">P3 <span class="text-gray-400">3</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== COLUMN TABS ========== -->
+  <div class="bg-white border-b border-gray-200 flex overflow-x-auto scrollbar-hide">
+    <button class="flex-shrink-0 px-4 py-2 text-xs font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 whitespace-nowrap">Ideas <span class="text-gray-400">2</span></button>
+    <button class="flex-shrink-0 px-4 py-2 text-xs font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 whitespace-nowrap">Backlog <span class="text-gray-400">4</span></button>
+    <button class="flex-shrink-0 px-4 py-2 text-xs font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 whitespace-nowrap">In Design <span class="text-gray-400">1</span></button>
+    <button class="flex-shrink-0 px-4 py-2 text-xs font-medium text-blue-600 border-b-2 border-blue-600 font-semibold whitespace-nowrap">In Progress <span class="text-blue-400">3</span></button>
+    <button class="flex-shrink-0 px-4 py-2 text-xs font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 whitespace-nowrap">In Review <span class="text-gray-400">2</span></button>
+    <button class="flex-shrink-0 px-4 py-2 text-xs font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 whitespace-nowrap">Done <span class="text-gray-400">8</span></button>
+    <button class="flex-shrink-0 px-4 py-2 text-xs font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 whitespace-nowrap">Blocked <span class="text-gray-400">1</span></button>
+  </div>
+
+  <!-- ========== BOARD CONTENT (In Progress column shown) ========== -->
+  <div class="flex-1 overflow-y-auto px-4 py-3">
+    <div class="space-y-3 max-w-lg">
+
+      <!-- Matching card 1 - highlighted with search match -->
+      <button class="w-full text-left bg-white rounded-lg shadow-sm p-4 border-l-4 border-l-transparent border border-blue-300 ring-2 ring-blue-200 hover:shadow-md transition-all min-h-[44px] animate-fade-in relative">
+        <div class="flex items-start gap-3 mb-2">
+          <span class="w-7 h-7 rounded-full bg-cyan-400 inline-flex items-center justify-center text-[10px] text-white font-bold flex-shrink-0">LE</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs font-medium text-gray-500">JB-12</span>
+              <span class="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-medium">Epic 3</span>
+            </div>
+            <h3 class="text-sm font-semibold text-gray-900 line-clamp-2">Implement <mark class="bg-yellow-200 text-gray-900 rounded px-0.5">auth</mark>entication flow with Google SSO</h3>
+          </div>
+          <span class="flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">P1</span>
+        </div>
+        <div class="flex items-center justify-between text-xs text-gray-500">
+          <span>lead-engineer</span>
+          <span>12 min ago</span>
+        </div>
+      </button>
+
+      <!-- Matching card 2 -->
+      <button class="w-full text-left bg-white rounded-lg shadow-sm p-4 border-l-4 border-l-transparent border border-blue-300 ring-2 ring-blue-200 hover:shadow-md transition-all min-h-[44px] animate-fade-in">
+        <div class="flex items-start gap-3 mb-2">
+          <span class="w-7 h-7 rounded-full bg-cyan-400 inline-flex items-center justify-center text-[10px] text-white font-bold flex-shrink-0">LE</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs font-medium text-gray-500">JB-18</span>
+              <span class="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-medium">Epic 3</span>
+            </div>
+            <h3 class="text-sm font-semibold text-gray-900 line-clamp-2">Add <mark class="bg-yellow-200 text-gray-900 rounded px-0.5">auth</mark> token refresh middleware</h3>
+          </div>
+          <span class="flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">P2</span>
+        </div>
+        <div class="flex items-center justify-between text-xs text-gray-500">
+          <span>lead-engineer</span>
+          <span>1 hour ago</span>
+        </div>
+      </button>
+
+      <!-- Non-matching card - dimmed -->
+      <button class="w-full text-left bg-white rounded-lg shadow-sm p-4 border-l-4 border-l-transparent border border-gray-200 hover:shadow-md transition-all min-h-[44px] opacity-30">
+        <div class="flex items-start gap-3 mb-2">
+          <span class="w-7 h-7 rounded-full bg-blue-400 inline-flex items-center justify-center text-[10px] text-white font-bold flex-shrink-0">DE</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs font-medium text-gray-500">JB-22</span>
+            </div>
+            <h3 class="text-sm font-semibold text-gray-900 line-clamp-2">Redesign settings page layout</h3>
+          </div>
+          <span class="flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">P3</span>
+        </div>
+        <div class="flex items-center justify-between text-xs text-gray-500">
+          <span>designer</span>
+          <span>3 hours ago</span>
+        </div>
+      </button>
+
+      <!-- Matching card 3 (matches in description, not title) -->
+      <button class="w-full text-left bg-white rounded-lg shadow-sm p-4 border-l-4 border-l-transparent border border-blue-300 ring-2 ring-blue-200 hover:shadow-md transition-all min-h-[44px] animate-fade-in">
+        <div class="flex items-start gap-3 mb-2">
+          <span class="w-7 h-7 rounded-full bg-red-400 inline-flex items-center justify-center text-[10px] text-white font-bold flex-shrink-0">SR</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs font-medium text-gray-500">JB-25</span>
+              <span class="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-medium">Security</span>
+            </div>
+            <h3 class="text-sm font-semibold text-gray-900 line-clamp-2">Review Firestore rules for <mark class="bg-yellow-200 text-gray-900 rounded px-0.5">auth</mark>orization gaps</h3>
+          </div>
+          <span class="flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">P0</span>
+        </div>
+        <div class="flex items-center justify-between text-xs text-gray-500">
+          <span>security-reviewer</span>
+          <span>5 hours ago</span>
+        </div>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ========== MOBILE VIEW ANNOTATION ========== -->
+  <div class="fixed bottom-0 left-0 right-0 bg-gray-900 text-white px-4 py-3 text-center">
+    <p class="text-sm font-medium">JB-45 Design Proposal: Search for Story</p>
+    <p class="text-xs text-gray-400 mt-1">Search input in filter header row &bull; Yellow highlight on matches &bull; Non-matches dimmed to 30% &bull; Match count badge &bull; Cmd+K shortcut</p>
+  </div>
+
+</body>
+</html>

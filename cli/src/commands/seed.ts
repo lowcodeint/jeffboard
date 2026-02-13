@@ -47,23 +47,23 @@ const AGENTS = [
     model: 'sonnet'
   },
   {
-    id: 'ui-consistency-reviewer',
-    name: 'ui-consistency-reviewer',
-    displayName: 'UI Consistency Reviewer',
-    abbreviation: 'UI',
+    id: 'designer',
+    name: 'designer',
+    displayName: 'Designer',
+    abbreviation: 'DS',
     color: 'blue',
     colorHex: '#60A5FA',
-    role: 'Ensures UI consistency and accessibility',
+    role: 'Reviews UI consistency, designs user experiences, and creates visual prototypes',
     model: 'sonnet'
   },
   {
-    id: 'mendix-code-explainer',
-    name: 'mendix-code-explainer',
-    displayName: 'Mendix Code Explainer',
-    abbreviation: 'MCE',
-    color: 'green',
-    colorHex: '#4ADE80',
-    role: 'Explains Mendix code and architecture',
+    id: 'quality-inspector',
+    name: 'quality-inspector',
+    displayName: 'Quality Inspector',
+    abbreviation: 'QI',
+    color: 'purple',
+    colorHex: '#C084FC',
+    role: 'Reviews completed work for quality and correctness',
     model: 'sonnet'
   }
 ];
@@ -108,14 +108,14 @@ export function createSeedCommand() {
         const projectRef = db.collection(COLLECTIONS.PROJECTS).doc();
         await projectRef.set({
           id: projectRef.id,
-          name: 'AgentBoard',
+          name: 'JeffBoard',
           description: 'Kanban board for AI agent work monitoring',
           shortCode: 'AB',
           isArchived: false,
           createdAt: FieldValue.serverTimestamp(),
           updatedAt: FieldValue.serverTimestamp()
         });
-        console.log(`  ✓ AgentBoard (${projectRef.id})`);
+        console.log(`  ✓ JeffBoard (${projectRef.id})`);
 
         // Initialize story counter
         await db

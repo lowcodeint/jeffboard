@@ -1,10 +1,10 @@
 {
-  "name": "agentboard-cli",
+  "name": "jeffboard-cli",
   "version": "1.0.0",
-  "description": "CLI tool for AI agents to update AgentBoard",
+  "description": "CLI tool for AI agents to update JeffBoard",
   "type": "module",
   "bin": {
-    "agentboard": "./dist/index.js"
+    "jeffboard": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -12,7 +12,7 @@
     "start": "node dist/index.js"
   },
   "keywords": [
-    "agentboard",
+    "jeffboard",
     "cli",
     "kanban",
     "ai-agents"
@@ -21,8 +21,9 @@
   "license": "MIT",
   "dependencies": {
     "commander": "^12.1.0",
+    "dotenv": "^16.4.7",
     "firebase-admin": "^13.0.1",
-    "dotenv": "^16.4.7"
+    "minimatch": "^10.1.2"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",

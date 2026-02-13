@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // Deny all client access. Admin SDK bypasses rules.
+      // Image URLs use download tokens for authentication.
+      allow read, write: if false;
+    }
+  }
+}

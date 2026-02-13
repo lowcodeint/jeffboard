@@ -4,40 +4,46 @@ import type { StoryStatus, Priority } from '../types';
 
 // Column order for the Kanban board
 export const COLUMN_ORDER: StoryStatus[] = [
+  'ideas',
   'backlog',
   'in-design',
   'in-progress',
   'in-review',
   'done',
-  'blocked'
+  'blocked',
+  'cancelled'
 ];
 
 // Status display names
 export const STATUS_NAMES: Record<StoryStatus, string> = {
+  'ideas': 'Ideas',
   'backlog': 'Backlog',
   'in-design': 'In Design',
   'in-progress': 'In Progress',
   'in-review': 'In Review',
   'done': 'Done',
-  'blocked': 'Blocked'
+  'blocked': 'Blocked',
+  'cancelled': 'Cancelled'
 };
 
 // Status background colors (Tailwind classes)
 export const STATUS_COLORS: Record<StoryStatus, string> = {
+  'ideas': 'bg-emerald-50 dark:bg-emerald-950',
   'backlog': 'bg-gray-50 dark:bg-gray-900',
   'in-design': 'bg-blue-50 dark:bg-blue-950',
   'in-progress': 'bg-yellow-50 dark:bg-yellow-950',
   'in-review': 'bg-purple-50 dark:bg-purple-950',
   'done': 'bg-green-50 dark:bg-green-950',
-  'blocked': 'bg-red-50 dark:bg-red-950'
+  'blocked': 'bg-red-50 dark:bg-red-950',
+  'cancelled': 'bg-slate-100 dark:bg-slate-900'
 };
 
 // Priority colors (Tailwind classes)
 export const PRIORITY_COLORS: Record<Priority, string> = {
-  'P0': 'bg-red-500 text-white',
-  'P1': 'bg-orange-500 text-white',
-  'P2': 'bg-yellow-500 text-white',
-  'P3': 'bg-gray-500 text-white'
+  'P0': 'bg-red-500 dark:bg-red-600 text-white shadow-sm',
+  'P1': 'bg-orange-500 dark:bg-orange-600 text-white shadow-sm',
+  'P2': 'bg-yellow-500 dark:bg-yellow-600 text-white shadow-sm',
+  'P3': 'bg-gray-500 dark:bg-gray-600 text-white shadow-sm'
 };
 
 // Agent color configuration
@@ -62,15 +68,15 @@ export const AGENT_COLORS: Record<string, { name: string; hex: string; tailwind:
     hex: '#F87171',
     tailwind: 'bg-red-400'
   },
-  'ui-consistency-reviewer': {
+  'designer': {
     name: 'blue',
     hex: '#60A5FA',
     tailwind: 'bg-blue-400'
   },
-  'mendix-code-explainer': {
-    name: 'green',
-    hex: '#4ADE80',
-    tailwind: 'bg-green-400'
+  'quality-inspector': {
+    name: 'purple',
+    hex: '#C084FC',
+    tailwind: 'bg-purple-400'
   }
 };
 

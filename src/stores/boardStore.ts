@@ -14,11 +14,15 @@ interface BoardState {
   setActiveColumnIndex: (index: number) => void;
 
   // Filters
-  agentFilter: string | null;
-  setAgentFilter: (agent: string | null) => void;
+  agentFilter: Set<string>;
+  toggleAgentFilter: (agentId: string) => void;
 
   priorityFilter: Set<Priority>;
   togglePriorityFilter: (priority: Priority) => void;
+
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+
   clearFilters: () => void;
 
   // Selected story (for detail sheet)
@@ -32,8 +36,9 @@ export const useBoardStore = create<BoardState>()(
       // Initial state
       activeProjectId: null,
       activeColumnIndex: 0,
-      agentFilter: null,
+      agentFilter: new Set<string>(),
       priorityFilter: new Set<Priority>(),
+      searchQuery: '',
       selectedStoryId: null,
 
       // Actions
@@ -41,7 +46,16 @@ export const useBoardStore = create<BoardState>()(
 
       setActiveColumnIndex: (index) => set({ activeColumnIndex: index }),
 
-      setAgentFilter: (agent) => set({ agentFilter: agent }),
+      toggleAgentFilter: (agentId) =>
+        set((state) => {
+          const newSet = new Set(state.agentFilter);
+          if (newSet.has(agentId)) {
+            newSet.delete(agentId);
+          } else {
+            newSet.add(agentId);
+          }
+          return { agentFilter: newSet };
+        }),
 
       togglePriorityFilter: (priority) =>
         set((state) => {
@@ -54,10 +68,13 @@ export const useBoardStore = create<BoardState>()(
           return { priorityFilter: newSet };
         }),
 
+      setSearchQuery: (query) => set({ searchQuery: query }),
+
       clearFilters: () =>
         set({
-          agentFilter: null,
-          priorityFilter: new Set<Priority>()
+          agentFilter: new Set<string>(),
+          priorityFilter: new Set<Priority>(),
+          searchQuery: ''
         }),
 
       setSelectedStoryId: (id) => set({ selectedStoryId: id })

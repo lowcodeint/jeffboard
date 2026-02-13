@@ -21,12 +21,12 @@ export function initializeFirebase(serviceAccountPath?: string): Firestore {
     // Get service account path from environment or parameter
     const accountPath =
       serviceAccountPath ||
-      process.env.AGENTBOARD_SERVICE_ACCOUNT ||
+      process.env.JEFFBOARD_SERVICE_ACCOUNT ||
       process.env.GOOGLE_APPLICATION_CREDENTIALS;
 
     if (!accountPath) {
       throw new Error(
-        'Service account path not provided. Set AGENTBOARD_SERVICE_ACCOUNT environment variable ' +
+        'Service account path not provided. Set JEFFBOARD_SERVICE_ACCOUNT environment variable ' +
           'or pass --service-account flag.'
       );
     }
@@ -38,7 +38,8 @@ export function initializeFirebase(serviceAccountPath?: string): Firestore {
 
     // Initialize Firebase Admin
     initializeApp({
-      credential: cert(serviceAccount)
+      credential: cert(serviceAccount),
+      storageBucket: 'jeff-board.firebasestorage.app'
     });
 
     db = getFirestore();
