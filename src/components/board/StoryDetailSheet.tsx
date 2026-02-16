@@ -37,6 +37,7 @@ export function StoryDetailSheet({ story, agents, onClose }: StoryDetailSheetPro
   const [assignmentDropdownOpen, setAssignmentDropdownOpen] = useState(false);
   const [assignmentUpdating, setAssignmentUpdating] = useState(false);
   const assignmentDropdownRef = useRef<HTMLDivElement>(null);
+  const [approving, setApproving] = useState(false);
   const isOpen = !!story;
 
   // Edit mode state
@@ -229,6 +230,23 @@ export function StoryDetailSheet({ story, agents, onClose }: StoryDetailSheetPro
     } finally {
       setAssignmentUpdating(false);
       setAssignmentDropdownOpen(false);
+    }
+  };
+
+  const handleApprove = async () => {
+    if (!story || approving) return;
+    setApproving(true);
+    try {
+      const authorName = user?.displayName || user?.email || 'Unknown';
+      await addNote(story.id, 'Approved', authorName);
+      await updateStoryFields(story.id, { assignedAgent: 'lead-engineer' });
+      await commitStatusChange('in-progress');
+      addToast('Story approved and moved to In Progress', 'success');
+    } catch (err) {
+      console.error('Failed to approve story:', err);
+      addToast('Failed to approve story', 'warning');
+    } finally {
+      setApproving(false);
     }
   };
 
@@ -567,6 +585,30 @@ export function StoryDetailSheet({ story, agents, onClose }: StoryDetailSheetPro
                     {story.blockedReason}
                   </div>
                 </div>
+                {story.status === 'blocked' && (
+                  <button
+                    onClick={handleApprove}
+                    disabled={approving}
+                    className="shrink-0 self-center flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {approving ? (
+                      <>
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Approving…
+                      </>
+                    ) : (
+                      <>
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                        Approve
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           )}
