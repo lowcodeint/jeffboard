@@ -119,14 +119,8 @@ export function BoardPage() {
       // Only show toast if update was in the last 5 seconds and we haven't
       // already toasted for this story being in this status
       if (timeSinceUpdate < 5000 && toastedStatus !== story.status) {
-        if (story.status === 'done' && story.previousStatus !== 'done') {
-          addToast(`${story.shortId} completed!`, 'success');
-          toastedStatusRef.current.set(story.id, story.status);
-        } else if (story.status === 'blocked' && story.previousStatus !== 'blocked') {
+        if (story.status === 'blocked' && story.previousStatus !== 'blocked') {
           addToast(`${story.shortId} is blocked`, 'warning');
-          toastedStatusRef.current.set(story.id, story.status);
-        } else if (story.status === 'cancelled' && story.previousStatus !== 'cancelled') {
-          addToast(`${story.shortId} cancelled`, 'info');
           toastedStatusRef.current.set(story.id, story.status);
         }
       }

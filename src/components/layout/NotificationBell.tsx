@@ -39,6 +39,7 @@ export function NotificationBell({ stories }: NotificationBellProps) {
   const unreadNotes = useMemo(() => {
     const result: UnreadNote[] = [];
     for (const story of stories) {
+      if (story.status !== 'blocked') continue;
       if (!story.notes?.length) continue;
       for (const note of story.notes) {
         if (!note.id) continue;
